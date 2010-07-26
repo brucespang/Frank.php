@@ -12,7 +12,9 @@
 			'delete' => array()
 		);
 		
-		private static $errors = array();
+		private static $errors, $templates = array();
+		
+		public static $view_path;
 		
 		public function run(){
 			if(!self::$run){
@@ -60,6 +62,22 @@
 			}
 		}
 		
+		public function render_template($name, $options){
+			$locals = $options['locals'] ? $options['locals'] : array();
+			if(isset(self::$templates[$name])){
+				$template = self::$templates[$name];
+				call_user_func($template, $locals);
+			}elseif(file_exists(self::$view_path.'/'.$name.'.html')){
+				$template = function($path, $locals){
+					require($path);
+				};
+				
+				$template(self::$view_path.'/'.$name.'.html', $locals);
+			}
+			
+			return self::$instance;
+		}
+		
 		public function add_route($method, $route, $block){
 			self::$routes[$method][$route] = $block;
 
@@ -72,6 +90,12 @@
 			return self::getInstance();
 		}
 		
+		public function add_template($name, $block){
+			self::$templates[$name] = $block;
+
+			return self::getInstance();
+		}
+		
 		private static function getInstance(){
 			if (self::$instance) {
 				return self::$instance;
@@ -79,6 +103,7 @@
 			return self::$instance = new self();
 		}
 	}
+	
 	
 	function get($route, $block){
 		Framr::add_route('get', $route, $block);
@@ -99,7 +124,19 @@
 	function not_found($block){
 		Framr::add_error('404', $block);
 	}
-
+	
+	function set($options){
+		if(isset($options['views']))
+			Framr::$view_path = $options['views'];
+	}
+	
+	function template($name, $block){
+		Framr::add_template($name, $block);
+	}
+	
+	function render($name, $options=array()){
+		Framr::render_template($name, $options);
+	}
 	
 	register_shutdown_function('Framr::run');
 

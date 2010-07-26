@@ -1,10 +1,16 @@
 <?php
 	require 'framr.php';
 	
+	set(array('views' => dirname(__FILE__) . '/templates'));
+	 
 	get("/", function(){
-	  echo '<form method="post">
-	        <input type="submit" value="submit" />
-	        </form>';
+	  render('form', array('locals' => array('test' => 'test')));
+	});
+	
+	template("form", function($locals){
+		echo '<form method="post">
+	        	<input type="submit" value="submit '.$locals['test'].'" />
+	        	</form>';
 	});
 	
 	post("/", function(){
