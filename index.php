@@ -1,6 +1,10 @@
 <?php
 	require 'framr.php';
 	
+	configure(function(){
+		$test = 'test';
+	});
+	
 	before(function(){
 		echo "BEFORE!";
 	});

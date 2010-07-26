@@ -167,6 +167,10 @@
 		Framr::add_filter('after', $function);
 	}
 	
+	function configure($function){
+		call_user_func($function);
+	}
+	
 	register_shutdown_function('Framr::run');
 
 ?>
