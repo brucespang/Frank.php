@@ -42,6 +42,13 @@
 					}
 				}
 				
+				if(!isset($block)){
+					if(isset(self::$errors['404']))
+						$block = self::$errors['404'];
+					else
+						$block = function(){ echo "We couldn't find that page."; };
+				}
+				
 				if(count($params) == 0)
 					call_user_func($block);
 				else
