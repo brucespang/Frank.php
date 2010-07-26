@@ -1,6 +1,14 @@
 <?php
 	require 'framr.php';
 	
+	before(function(){
+		echo "BEFORE!";
+	});
+	
+	after(function(){
+		echo "AFTER!";
+	});
+	
 	set(array('views' => dirname(__FILE__) . '/templates'));
 	 
 	get("/", function(){
@@ -9,7 +17,7 @@
 	
 	template("form", function($locals){
 		echo '<form method="post">
-	        	<input type="submit" value="submit '.$locals['test'].'" />
+	        	<input type="submit" value="submit" />
 	        	</form>';
 	});
 	

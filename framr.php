@@ -12,6 +12,11 @@
 			'delete' => array()
 		);
 		
+		private static $filters = array(
+			'before' => array(),
+			'after' => array()
+		);
+		
 		private static $errors, $templates = array();
 		
 		public static $view_path;
@@ -22,6 +27,9 @@
 				$method = $_SERVER['REQUEST_METHOD'];
 				
 				$method = strtolower($method);
+		
+				foreach(self::$filters['before'] as $before)
+					call_user_func($before);
 				
 				$params = array();
 				
@@ -56,6 +64,9 @@
 				else
 					call_user_func($block, $params);
 				
+				foreach(self::$filters['after'] as $after)
+					call_user_func($after);
+					
 				self::$run = true;
 			} else {
 				throw new Exception("Framr has already been run.");
@@ -64,18 +75,28 @@
 		
 		public function render_template($name, $options){
 			$locals = $options['locals'] ? $options['locals'] : array();
+			
 			if(isset(self::$templates[$name])){
+			
 				$template = self::$templates[$name];
+				
 				call_user_func($template, $locals);
+			
 			}elseif(file_exists(self::$view_path.'/'.$name.'.html')){
+			
 				$template = function($path, $locals){
 					require($path);
 				};
 				
 				$template(self::$view_path.'/'.$name.'.html', $locals);
+			
 			}
 			
 			return self::$instance;
+		}
+		
+		function add_filter($type, $function){
+			array_push(self::$filters[$type], $function);
 		}
 		
 		public function add_route($method, $route, $block){
@@ -136,6 +157,14 @@
 	
 	function render($name, $options=array()){
 		Framr::render_template($name, $options);
+	}
+	
+	function before($function){
+		Framr::add_filter('before', $function);
+	}
+	
+	function after($function){
+		Framr::add_filter('after', $function);
 	}
 	
 	register_shutdown_function('Framr::run');
