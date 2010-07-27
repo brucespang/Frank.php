@@ -27,9 +27,6 @@
 				$method = $_SERVER['REQUEST_METHOD'];
 				
 				$method = strtolower($method);
-		
-				foreach(self::$filters['before'] as $before)
-					call_user_func($before);
 				
 				$params = array();
 				
@@ -59,6 +56,9 @@
 					else
 						$block = function(){ echo "We couldn't find that page."; };
 				}
+		
+				foreach(self::$filters['before'] as $before)
+					call_user_func($before);
 				
 				if(count($params) == 0)
 					call_user_func($block);
