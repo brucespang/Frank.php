@@ -53,6 +53,7 @@
 				}
 				
 				if(!isset($block)){
+					header("HTTP/1.0 404 Not Found");
 					if(isset(self::$errors['404']))
 						$block = self::$errors['404'];
 					else
