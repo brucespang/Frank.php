@@ -1,0 +1,28 @@
+Framr is a clone of Sinatra in php. It's much like the default version of Sinatra, with a few things missing (because php is stupid, or because I haven't gotten around to it yet).
+
+What Framr is missing:
+1. Spiffy template languages like haml and sass.
+2. Middleware.
+3. Error handling besides not_found(function(){});
+4. Helpers
+5. Environments
+6. Halting
+7. Passing
+8. Testing
+9. Regex routes, or using "*" in routes. Just use :whatever, and you'll be all set.
+
+Here is Sinatra's hello world:
+require 'sinatra'
+
+get "/" do
+	"Hello, World"
+end
+
+And here is Framr's hello world:
+require('framr.php');
+
+get("/", function(){
+	echo "Hello, World";
+});
+
+As you can see, they're fairly similar.
