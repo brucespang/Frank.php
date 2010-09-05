@@ -17,7 +17,7 @@
 			'after' => array()
 		);
 		
-		private static $errors, $templates = array();
+		private static $errors, $request, $templates = array();
 
 		public static $view_path;
 		
@@ -25,32 +25,28 @@
 		 * Public functions
 		 */	
 		 	
-		public function run(){
-			if(!self::$run){
-				$request = str_replace(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)), '', $_SERVER['REQUEST_URI']);
-				$method = $_SERVER['REQUEST_METHOD'];
-				
-				$method = strtolower($method);
-				
-				$routing_information = self::route($method, $request);
-				$block = $routing_information[0];
-				$params = $routing_information[1];
+		public function run($options=array()){
+    		$request = self::get_request();
+    		$method = $_SERVER['REQUEST_METHOD'];
 		
-				foreach(self::$filters['before'] as $before)
-					call_user_func($before);
-				
-				if(count($params) == 0)
-					call_user_func($block);
-				else
-					call_user_func($block, $params);
-				
-				foreach(self::$filters['after'] as $after)
-					call_user_func($after);
-					
-				self::$run = true;
-			} else {
-				throw new Exception("Framr has already been run.");
-			}
+    		$method = strtolower($method);
+		
+    		$routing_information = self::route($method, $request);
+    		$block = $routing_information[0];
+    		$params = $routing_information[1];
+
+            if(isset($options['pass']) && $options['pass'] != true)
+    		    foreach(self::$filters['before'] as $before)
+    			    call_user_func($before);
+		
+    		if(count($params) == 0)
+    			call_user_func($block);
+    		else
+    			call_user_func($block, $params);
+
+            if(isset($options['pass']) && $options['pass'] != true)
+    		    foreach(self::$filters['after'] as $after)
+    			    call_user_func($after);
 		}
 		
 		public function render_template($name, $options){
@@ -97,9 +93,20 @@
 			return self::getInstance();
 		}
 		
+		public function set_request($request){
+		    self::$request = $request;
+		}
+		
 		/**
 		 * Private functions
 		 */
+
+ 		private function get_request(){
+ 		    if(self::$request)
+ 		        return self::$request;
+ 		    else
+ 		        return str_replace(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)), '', $_SERVER['REQUEST_URI']);
+ 		}
 		 
 		private static function getInstance(){
 			if (self::$instance) {
@@ -186,6 +193,11 @@
 	
 	function configure($function){
 		call_user_func($function);
+	}
+	
+	function pass($route){
+	    Framr::set_request($route);
+	    Framr::run(array('pass' => true));
 	}
 	
 	register_shutdown_function('Framr::run');

@@ -6,7 +6,6 @@
 	});
 	
 	before(function(){
-		echo "BEFORE!";
 	});
 	
 	after(function(){
@@ -16,7 +15,8 @@
 	set(array('views' => dirname(__FILE__) . '/templates'));
 	 
 	get("/", function(){
-	  render('form', array('locals' => array('test' => 'test')));
+      // render('form', array('locals' => array('test' => 'test')));
+      pass('/hello/bruce');
 	});
 	
 	template("form", function($locals){

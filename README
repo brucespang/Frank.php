@@ -25,4 +25,4 @@ get("/", function(){
 	echo "Hello, World";
 });
 
-As you can see, they're fairly similar.
+As you can see, they're fairly similar. Check out index.php for more examples.
