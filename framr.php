@@ -18,9 +18,13 @@
 		);
 		
 		private static $errors, $templates = array();
-		
+
 		public static $view_path;
 		
+		/**
+		 * Public functions
+		 */	
+		 	
 		public function run(){
 			if(!self::$run){
 				$request = str_replace(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)), '', $_SERVER['REQUEST_URI']);
@@ -28,34 +32,9 @@
 				
 				$method = strtolower($method);
 				
-				$params = array();
-				
-				if(isset(self::$routes[$method][$request])){
-					$block = self::$routes[$method][$request];
-				}else{	
-					$wilds = preg_grep('#^/.*/:.*$#', array_keys(self::$routes[$method]));
-					
-					foreach($wilds as $wild){
-						$wild_preg = preg_replace('/:[A-Za-z0-9]+/', '(.*?)', $wild);
-						if(preg_match("#^$wild_preg\$#", $request, $matches)){
-							$block = self::$routes[$method][$wild];
-							preg_match('/:[A-Za-z0-9]+/', $wild, $wild_names);
-							foreach($wild_names as $key => $wild_name){
-								$wild_name = str_replace(':', '', $wild_name);
-								$params[$wild_name] = urldecode($matches[$key+1]);
-							}
-						}
-							
-					}
-				}
-				
-				if(!isset($block)){
-					header("HTTP/1.0 404 Not Found");
-					if(isset(self::$errors['404']))
-						$block = self::$errors['404'];
-					else
-						$block = function(){ echo "We couldn't find that page."; };
-				}
+				$routing_information = self::route($method, $request);
+				$block = $routing_information[0];
+				$params = $routing_information[1];
 		
 				foreach(self::$filters['before'] as $before)
 					call_user_func($before);
@@ -96,7 +75,7 @@
 			return self::$instance;
 		}
 		
-		function add_filter($type, $function){
+		public function add_filter($type, $function){
 			array_push(self::$filters[$type], $function);
 		}
 		
@@ -118,11 +97,48 @@
 			return self::getInstance();
 		}
 		
+		/**
+		 * Private functions
+		 */
+		 
 		private static function getInstance(){
 			if (self::$instance) {
 				return self::$instance;
 			}
 			return self::$instance = new self();
+		}
+		
+		private function route($method, $request){
+		    $params = array();
+			
+			if(isset(self::$routes[$method][$request])){
+				$block = self::$routes[$method][$request];
+			}else{	
+				$wilds = preg_grep('#^/.*/:.*$#', array_keys(self::$routes[$method]));
+				
+				foreach($wilds as $wild){
+					$wild_preg = preg_replace('/:[A-Za-z0-9]+/', '(.*?)', $wild);
+					if(preg_match("#^$wild_preg\$#", $request, $matches)){
+						$block = self::$routes[$method][$wild];
+						preg_match('/:[A-Za-z0-9]+/', $wild, $wild_names);
+						foreach($wild_names as $key => $wild_name){
+							$wild_name = str_replace(':', '', $wild_name);
+							$params[$wild_name] = urldecode($matches[$key+1]);
+						}
+					}
+						
+				}
+			}
+			
+			if(!isset($block)){
+				header("HTTP/1.0 404 Not Found");
+				if(isset(self::$errors['404']))
+					$block = self::$errors['404'];
+				else
+					$block = function(){ echo "We couldn't find that page."; };
+			}
+			
+			return array($block, $params);
 		}
 	}
 	
