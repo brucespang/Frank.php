@@ -15,8 +15,7 @@
 	set(array('views' => dirname(__FILE__) . '/templates'));
 	 
 	get("/", function(){
-      // render('form', array('locals' => array('test' => 'test')));
-      pass('/hello/bruce');
+      render('form', array('locals' => array('test' => 'test')));
 	});
 	
 	template("form", function($locals){
@@ -30,7 +29,7 @@
 	});
 	
 	get("/hello/:name", function($params){
-		echo 'Hi, '.$params['name'];
+		pass('/hello/'.$params['name'].'/test');
 	});
 	
 	get("/hello/:name/test", function($params){

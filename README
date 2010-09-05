@@ -7,9 +7,8 @@ What Framr is missing:
 4. Helpers
 5. Environments
 6. Halting
-7. Passing
-8. Testing
-9. Regex routes, or using "*" in routes. Just use :whatever, and you'll be all set.
+7. Testing
+8. Regex routes, or using "*" in routes. Just use :whatever, and you'll be all set.
 
 Here is Sinatra's hello world:
 require 'sinatra'
