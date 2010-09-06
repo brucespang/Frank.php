@@ -1,6 +1,6 @@
-Framr is a clone of Sinatra in php. It's much like the default version of Sinatra, with a few things missing (because php is stupid, or because I haven't gotten around to it yet).
+Frank.php is a clone of Sinatra.rb. It's much like the default version of Sinatra, with a few things missing (because php is stupid, or because I haven't gotten around to it yet).
 
-What Framr is missing:
+What Frank.php is missing:
 1. Spiffy template languages like haml and sass.
 2. Middleware.
 3. Error handling besides not_found(function(){});
@@ -17,8 +17,8 @@ get "/" do
 	"Hello, World"
 end
 
-And here is Framr's hello world:
-require('framr.php');
+And here is Frank.php's hello world:
+require 'frank.php';
 
 get("/", function(){
 	echo "Hello, World";

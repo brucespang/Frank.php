@@ -1,18 +1,14 @@
 <?php
-	require 'framr.php';
+	require 'frank.php';
 	
 	configure(function(){
 		$test = 'test';
-	});
-	
-	before(function(){
+		set(array('views' => dirname(__FILE__) . '/templates'));
 	});
 	
 	after(function(){
 		echo "AFTER!";
 	});
-	
-	set(array('views' => dirname(__FILE__) . '/templates'));
 	 
 	get("/", function(){
       render('form', array('locals' => array('test' => 'test')));
