@@ -36,14 +36,18 @@
     		$params = $routing_information[1];
 
         // Create functions from all of the Helpers class methods
-        if(class_exists('Helpers')){
+		/**
+		 * @author AndrewLowther
+		 * Commenting out this in, replacing with __call method.
+		 */
+        /*if(class_exists('Helpers')){
           foreach(get_class_methods('Helpers') as $function){
             // Fairly hackish, so it would be good to rewrite this.
             eval("function $function(){
               return call_user_func_array(array('Helpers', '$function'), func_get_args());
             }");
           }
-        }
+        }*/
 
         // Catch all output so that halting works.
     		ob_start();
@@ -297,6 +301,25 @@
     
     die($body);
   }
+
+	/**
+	 * @method __call
+	 * @author AndrewLowther
+	 * @param $method | Method to call
+	 * @param $args | Function arguments
+	 * Slightly less hackish way of calling methods
+	 */
+	public function __call($method, $args) {
+		
+		if(method_exists($this, $method)) {
+			return call_user_func_array(array($this, $method), $args);
+		} else if(method_exists('Helpers', $method)) {
+			return call_user_func_array(array('Helpers', $method), $args);
+		} else {
+			throw new Exception("Method " . $method . "() not implemented");
+		}
+
+	}
 
 	register_shutdown_function('Frank::run', E_ALL);
 
