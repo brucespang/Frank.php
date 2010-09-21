@@ -22,7 +22,7 @@
 		public static $view_path;
 		
 		/**
-		 * public static functions
+		 * Public functions
 		 */	
 		
 		public static function run($options=array()){
@@ -34,22 +34,34 @@
     		$routing_information = self::route($method, $request);
     		$block = $routing_information[0];
     		$params = $routing_information[1];
+
+        // Create functions from all of the Helpers class methods
+        if(class_exists('Helpers')){
+          foreach(get_class_methods('Helpers') as $function){
+            // Fairly hackish, so it would be good to rewrite this.
+            eval("function $function(){
+              return call_user_func_array(array('Helpers', '$function'), func_get_args());
+            }");
+          }
+        }
+
+        // Catch all output so that halting works.
     		ob_start();
-        if(!isset($options['pass']) || $options['pass'] != true)
-    		    foreach(self::$filters['before'] as $before)
-    			    call_user_func($before);
+          if(!isset($options['pass']) || $options['pass'] != true)
+      		    foreach(self::$filters['before'] as $before)
+      			    call_user_func($before);
 		
-    		if(count($params) == 0)
-    			call_user_func($block);
-    		else
-          call_user_func($block, $params); 
+      		if(count($params) == 0)
+      			call_user_func($block);
+      		else
+            call_user_func($block, $params); 
 
-        if(!isset($options['pass']) || $options['pass'] != true)
-  		    foreach(self::$filters['after'] as $after)
+          if(!isset($options['pass']) || $options['pass'] != true)
+    		    foreach(self::$filters['after'] as $after)
 
-		    call_user_func($after);
+  		    call_user_func($after);
 		    
-				$yield = ob_get_contents();
+  				$yield = ob_get_contents();
 				ob_end_clean();
 				
 			  echo $yield;

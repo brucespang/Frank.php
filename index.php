@@ -35,7 +35,7 @@
 	});
 	
 	get("/hello/:name/test", function($params){
-		echo Helpers::hello($params['name']);
+		echo hello($params['name']);
 		halt(404, 'Go away', array('Content-Type' => 'text/plain'));
 	});
 	
