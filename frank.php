@@ -169,6 +169,26 @@
 			
 			return array($block, $params);
 		}
+		
+		/**
+		 * @method __call
+		 * @author AndrewLowther
+		 * @param $method | Method to call
+		 * @param $args | Function arguments
+		 * Slightly less hackish way of calling methods
+		 */
+		public function __call($method, $args) {
+
+			if(method_exists($this, $method)) {
+				return call_user_func_array(array($this, $method), $args);
+			} else if(method_exists('Helpers', $method)) {
+				return call_user_func_array(array('Helpers', $method), $args);
+			} else {
+				throw new Exception("Method " . $method . "() not implemented");
+			}
+
+		}
+		
 	}
 	
 	
@@ -301,25 +321,6 @@
     
     die($body);
   }
-
-	/**
-	 * @method __call
-	 * @author AndrewLowther
-	 * @param $method | Method to call
-	 * @param $args | Function arguments
-	 * Slightly less hackish way of calling methods
-	 */
-	public function __call($method, $args) {
-		
-		if(method_exists($this, $method)) {
-			return call_user_func_array(array($this, $method), $args);
-		} else if(method_exists('Helpers', $method)) {
-			return call_user_func_array(array('Helpers', $method), $args);
-		} else {
-			throw new Exception("Method " . $method . "() not implemented");
-		}
-
-	}
 
 	register_shutdown_function('Frank::run', E_ALL);
 
