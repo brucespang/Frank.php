@@ -1,3 +1,12 @@
-RewriteEngine   On
+<Files .*>
+Order Deny,Allow
+Allow From All
+</Files>
 
-RewriteRule		(.*)	index.php?q=$1 [L]
+RewriteEngine On
+Options +FollowSymlinks
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule (.*$) /index.php?q=/$1
