@@ -1,13 +1,19 @@
 <?php
 	require 'frank.php';
 	
+	class Helpers{
+	  function hello($name){
+	    return "Hello, $name";
+	  }
+	}
+	
 	configure(function(){
 		$test = 'test';
 		set(array('views' => dirname(__FILE__) . '/templates'));
 	});
 	
 	after(function(){
-		echo "AFTER!";
+		echo " AFTER!";
 	});
 	 
 	get("/", function(){
@@ -29,7 +35,7 @@
 	});
 	
 	get("/hello/:name/test", function($params){
-		echo 'Hi, '.$params['name']." TEST!";
+		echo Helpers::hello($params['name']);
 	});
 	
 	not_found(function(){
