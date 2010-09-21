@@ -2,9 +2,9 @@
 	require 'frank.php';
 	
 	class Helpers{
-	  function hello($name){
-	    return "Hello, $name";
-	  }
+		function hello($name){
+			return "Hello, $name";
+		}
 	}
 	
 	configure(function(){
@@ -17,7 +17,7 @@
 	});
 	 
 	get("/", function(){
-      render('form', array('locals' => array('test' => 'test')));
+		render('form', array('locals' => array('test' => 'test')));
 	});
 	
 	template("form", function($locals){
@@ -27,7 +27,7 @@
 	});
 	
 	post("/", function(){
-	  echo "post";
+		echo "post";
 	});
 	
 	get("/hello/:name", function($params){
