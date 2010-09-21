@@ -36,6 +36,7 @@
 	
 	get("/hello/:name/test", function($params){
 		echo Helpers::hello($params['name']);
+		halt(404, 'Go away', array('Content-Type' => 'text/plain'));
 	});
 	
 	not_found(function(){

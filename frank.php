@@ -1,5 +1,5 @@
 <?php
-
+  
 	class Frank{
 		private static $instance;
 		
@@ -22,10 +22,10 @@
 		public static $view_path;
 		
 		/**
-		 * Public functions
+		 * public static functions
 		 */	
-		 	
-		public function run($options=array()){
+		
+		public static function run($options=array()){
     		$request = self::get_request();
     		$method = $_SERVER['REQUEST_METHOD'];
 		
@@ -34,7 +34,7 @@
     		$routing_information = self::route($method, $request);
     		$block = $routing_information[0];
     		$params = $routing_information[1];
-
+    		ob_start();
         if(!isset($options['pass']) || $options['pass'] != true)
     		    foreach(self::$filters['before'] as $before)
     			    call_user_func($before);
@@ -42,14 +42,20 @@
     		if(count($params) == 0)
     			call_user_func($block);
     		else
-    			call_user_func($block, $params);
+          call_user_func($block, $params); 
 
         if(!isset($options['pass']) || $options['pass'] != true)
   		    foreach(self::$filters['after'] as $after)
-  			    call_user_func($after);
+
+		    call_user_func($after);
+		    
+				$yield = ob_get_contents();
+				ob_end_clean();
+				
+			  echo $yield;
 		}
 		
-		public function render_template($name, $options){
+		public static function render_template($name, $options){
 			$locals = $options['locals'] ? $options['locals'] : array();
 			
 			if(isset(self::$templates[$name])){
@@ -71,29 +77,29 @@
 			return self::$instance;
 		}
 		
-		public function add_filter($type, $function){
+		public static function add_filter($type, $function){
 			array_push(self::$filters[$type], $function);
 		}
 		
-		public function add_route($method, $route, $block){
+		public static function add_route($method, $route, $block){
 			self::$routes[$method][$route] = $block;
 
 			return self::getInstance();
 		}
 		
-		public function add_error($error, $block){
+		public static function add_error($error, $block){
 			self::$errors[$error] = $block;
 
 			return self::getInstance();
 		}
 		
-		public function add_template($name, $block){
+		public static function add_template($name, $block){
 			self::$templates[$name] = $block;
 
 			return self::getInstance();
 		}
 		
-		public function set_request($request){
+		public static function set_request($request){
 		    self::$request = $request;
 		}
 		
@@ -101,7 +107,7 @@
 		 * Private functions
 		 */
 
- 		private function get_request(){
+ 		private static function get_request(){
  		    if(self::$request)
  		        return self::$request;
  		    else
@@ -115,7 +121,7 @@
 			return self::$instance = new self();
 		}
 		
-		private function route($method, $request){
+		private static function route($method, $request){
 		    $params = array();
 			
 			if(isset(self::$routes[$method][$request])){
@@ -199,7 +205,87 @@
 	    Frank::set_request($route);
 	    Frank::run(array('pass' => true));
 	}
-	
-	register_shutdown_function('Frank::run');
+
+  function halt(){
+    $args = func_get_args();
+    
+    // List of status codes for ease of mapping $status
+    $status_codes = array(
+                      // Informational 1xx
+                      100 => 'Continue',
+                      101 => 'Switching Protocols',
+                      // Successful 2xx
+                      200 => 'OK',
+                      201 => 'Created',
+                      202 => 'Accepted',
+                      203 => 'Non-Authoritative Information',
+                      204 => 'No Content',
+                      205 => 'Reset Content',
+                      206 => 'Partial Content',
+                      // Redirection 3xx
+                      300 => 'Multiple Choices',
+                      301 => 'Moved Permanently',
+                      302 => 'Found',
+                      303 => 'See Other',
+                      304 => 'Not Modified',
+                      305 => 'Use Proxy',
+                      307 => 'Temporary Redirect',
+                      // Client Error 4xx
+                      400 => 'Bad Request',
+                      401 => 'Unauthorized',
+                      402 => 'Payment Required',
+                      403 => 'Forbidden',
+                      404 => 'Not Found',
+                      405 => 'Method Not Allowed',
+                      406 => 'Not Acceptable',
+                      407 => 'Proxy Authentication Required',
+                      408 => 'Request Timeout',
+                      409 => 'Conflict',
+                      410 => 'Gone',
+                      411 => 'Length Required',
+                      412 => 'Precondition Failed',
+                      413 => 'Request Entity Too Large',
+                      414 => 'Request-URI Too Long',
+                      415 => 'Unsupported Media Type',
+                      416 => 'Request Range Not Satisfiable',
+                      417 => 'Expectation Failed',
+                      // Server Error 5xx
+                      500 => 'Internal Server Error',
+                      501 => 'Not Implemented',
+                      502 => 'Bad Gateway',
+                      503 => 'Service Unavailable',
+                      504 => 'Gateway Timeout',
+                      505 => 'HTTP Version Not Supported'
+                    );
+    
+    // Set default values
+    $status = false;
+    $headers = array();
+    $body = '';
+    
+    foreach($args as $arg){
+      if(is_numeric($arg)){
+        $status = $arg;
+      } elseif(is_array($arg)){
+        $headers = $arg;
+      } elseif(is_string($arg)) {
+        $body = $arg;
+      }
+    }
+    
+    if($status !== false){
+      if(isset($status_codes[$status])){
+        $status_message = $status_codes[$status];
+        header("HTTP/1.1 $status $status_message");
+      }
+    }
+    
+    foreach($headers as $type => $header)
+      header("$type: $header", $status);
+    
+    die($body);
+  }
+
+	register_shutdown_function('Frank::run', E_ALL);
 
 ?>
