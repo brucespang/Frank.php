@@ -1,3 +1,9 @@
 RewriteEngine   On
 
-RewriteRule		(.*)	index.php?q=$1 [L]
+#Rewrite Rules
+
+RewriteRule     ^$							  index.php?q=/ [L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule     (.*)                          index.php?q=$1 [L]
