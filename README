@@ -16,7 +16,7 @@ get "/" do
 end
 
 And here is Frank.php's hello world:
-require 'frank.php';
+require 'frank/frank.php';
 
 get("/", function(){
 	echo "Hello, World";

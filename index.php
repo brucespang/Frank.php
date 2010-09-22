@@ -1,5 +1,5 @@
 <?php
-	require 'frank.php';
+	require 'frank/frank.php';
 	
 	class Helpers{
 		function hello($name){
@@ -17,25 +17,38 @@
 	});
 	 
 	get("/", function(){
-		render('form', array('locals' => array('test' => 'test')));
+		echo "Welcome to Frank.php";
 	});
 	
-	template("form", function($locals){
-		echo '<form method="post">
-	        	<input type="submit" value="submit" />
-	        	</form>';
+	get("/template", function(){
+		render('template', array('locals' => array('name' => 'template')));	
 	});
 	
-	post("/", function(){
+	template("template", function($locals){
+		echo 'Hello from '.$locals['name'];
+	});
+	
+	post("/post", function(){
 		echo "post";
 	});
 	
-	get("/hello/:name", function($params){
-		pass('/hello/'.$params['name'].'/test');
+	put("/put", function(){
+		echo "put";
 	});
 	
-	get("/hello/:name/test", function($params){
+	delete("/delete", function(){
+		echo "delete";
+	});
+	
+	get("/pass", function(){
+		pass('/hello/passing');
+	});
+	
+	get("/hello/:name", function($params){
 		echo hello($params['name']);
+	});
+	
+	get("/halt", function(){
 		halt(404, 'Go away', array('Content-Type' => 'text/plain'));
 	});
 	
