@@ -39,9 +39,11 @@
 			if(class_exists('Helpers')){
 			  foreach(get_class_methods('Helpers') as $function){
 			    // Fairly hackish, so it would be good to rewrite this.
-			    eval("function $function(){
-			      return call_user_func_array(array('Helpers', '$function'), func_get_args());
-			    }");
+				if(!function_exists($function)){
+				    eval("function $function(){
+				      return call_user_func_array(array('Helpers', '$function'), func_get_args());
+				    }");
+				}
 			  }
 			}
 
