@@ -1,4 +1,4 @@
-Frank.php is a clone of Sinatra.rb. It's much like the default version of Sinatra, with a few things missing (because php is stupid, or because I haven't gotten around to it yet).
+Frank.php is a clone of Sinatra.rb. It's much like Sinatra, with a few things missing (because php is stupid, or because I haven't gotten around to it yet).
 
 What Frank.php is missing:
 1. Spiffy template languages like haml and sass.
