@@ -6,8 +6,6 @@
 	class FrankTest extends PHPUnit_Framework_TestCase{
 
 		/**
-		 * @method testTemplate
-		 * 
 		 * Tests if templating works
 		 */
 		public function testTemplate(){
@@ -15,17 +13,13 @@
 		}
 		
 		/**
-		 * @method testHello
-		 *
-		 * Tests if Frank says Hello, name on request of /hello/name
+		 * Tests variables in urls
 		 */
 		public function testHello(){
 			$this->assertEquals("Hello, name", $this->get_data('/hello/name', array('pass' => true)));
 		}
 		
 		/**
-		 * @method testPass
-		 *
 		 * Tests if passing works as expected
 		 */
 		public function testPass(){
@@ -33,8 +27,6 @@
 		}
 		
 		/**
-		 * @method testHalt
-		 *
 		 * Tests if halting works as expected
 		 */
 		public function testHalt(){
@@ -42,8 +34,6 @@
 		}
 		
 		/**
-		 * @method testPost
-		 *
 		 * Tests if post requests work correctly
 		 */
 		public function testPost(){
@@ -51,8 +41,6 @@
 		}
 
 		/**
-		 * @method testDelete
-		 *
 		 * Tests if delete requests work correctly
 		 */
 		public function testDelete(){
@@ -60,8 +48,6 @@
 		}
 
 		/**
-		 * @method testPost
-		 *
 		 * Tests if put requests work correctly
 		 */
 		public function testPut(){
@@ -69,15 +55,23 @@
 		}
 		
 		/**
+		 * Tests if 404s work
+		 */
+		public function test404(){
+			$this->assertEquals("This file wasn't found, yo!", $this->get_data('/not_found', array('pass' => true)));
+		}
+		
+		/**
 		 * Private Functions
 		 */
 		
 		/**
-		 * @method get_data
-		 * @param 	string	path (in Frank) to get the data for
-		 * @param	array	set of options to pass to Frank::exec()
-		 * @param	method	type of request to the server (i.e. get, post, put, delete)
-		 * @return 	string	data the function outputs
+		 * Gets the output from a url
+		 *
+		 * @param 	string	$url	 path (in Frank) to get the data for
+		 * @param	array	$options set of options to pass to Frank::exec()
+		 * @param	string	$method  type of request to the server (i.e. get, post, put, delete)
+		 * @return 	string			 data the function outputs
 		 */
 		private function get_data($url, $options=array(), $method='get'){
 			Frank::set_request($url);

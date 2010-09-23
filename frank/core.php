@@ -1,19 +1,61 @@
 <?php
 	class Frank{
-		private static $instance;
-	
+
+		/**
+		 * Stores whether or not Frank has been successfully run.
+		 *
+		 * @var boolean
+		 */
 		private static $run = false;
+		
+		/**
+		 * Requested Path
+		 *
+		 * @var string
+		 */
+		private static $request = '';
+		
+		/**
+		 * Method of the request (e.g. get, post, put, delete)
+		 *
+		 * @var string
+		 */
+		private static $method = '';
 	
-		private static $method;
-	
+		/**
+		 * Checks if halt has killed frank's execution. We can't use die() from the 
+		 * command line, so for tests to work, this has to be present.
+		 *
+		 * @var boolean
+		 */
 		private static $dead = false;
 	
-		private static $status;
+		/**
+		 * Response status code to return to client
+		 *
+		 * @var integer
+		 */
+		private static $status = 200;
 
-		private static $headers;
+		/**
+		 * Array of headers to return to client
+		 *
+		 * @var array
+		 */
+		private static $headers = array();
 
+		/**
+		 * Script's output
+		 *
+		 * @var string
+		 */
 		private static $body = '';
 	
+		/**
+		 * Array of each request method's routes and corresponding functions
+		 *
+		 * @var array
+		 */
 		private static $routes = array(
 			'get' => array(),
 			'post' => array(),
@@ -21,18 +63,47 @@
 			'delete' => array()
 		);
 	
+		/**
+		 * Before and After arrays of functions to call before or after script execution
+		 *
+		 * @var array
+		 */
 		private static $filters = array(
 			'before' => array(),
 			'after' => array()
 		);
 	
-		private static $errors, $request, $templates = array();
+		/**
+		 * List of errors and their corresponding functions
+		 *
+		 * @var array
+		 */
+		private static $errors = array();
+		
+		/**
+		 * Array of template functions
+		 *
+		 * @var array
+		 */
+		private static $templates = array();
 
-		public static $view_path;
+		/**
+		 * Template directory location
+		 *
+		 * @var string
+		 */
+		public static $view_path = '';
 	
 		/**
 		 * Public functions
 		 */	
+		
+		/**
+		 * Main function, gets route information, and executes script
+		 *
+		 * @param  array $options General execution control
+		 * @return array Standard rack return: Status Code, array of headers, body
+		 */
 		public static function call($options=array()){
 			$request = self::get_request();
 			$method = self::get_method();
@@ -71,10 +142,16 @@
 				$yield = ob_get_contents();
 			ob_end_clean();
 		
-			self::set_status(array(200, array(), $yield));
+			self::set_status(array(self::$status, self::$headers, $yield));
 			return array(self::$status, self::$headers, self::$body);
 		}
 	
+		/**
+		 * Renders a template
+		 *
+		 * @param string $name		Name of the template
+		 * @param array  $options	Options to control template rendering
+		 */
 		public static function render_template($name, $options){
 			$locals = $options['locals'] ? $options['locals'] : array();
 			
@@ -98,65 +175,15 @@
 					self::$body .= ob_get_contents();
 				ob_end_clean();
 			}
-		
-			return self::$instance;
-		}
-	
-		public static function set_run($run){
-			self::$run = $run;
 		}
 		
-		public static function was_run(){
-			return self::$run;
-		}
-		
-		public static function set_status($status){
-			self::$status = $status[0];
-			self::$headers = $status[1];
-
-			if($status[2] !== false)
-				self::$body .= $status[2];
-			else
-				self::$body = '';
-		}
-		
-		public static function get_status(){
-			return array(self::$status, self::$headers, self::$body);
-		}
-	
-		public static function add_filter($type, $function){
-			array_push(self::$filters[$type], $function);
-		}
-	
-		public static function add_route($method, $route, $block){
-			self::$routes[$method][$route] = $block;
-
-			return self::getInstance();
-		}
-	
-		public static function add_error($error, $block){
-			self::$errors[$error] = $block;
-
-			return self::getInstance();
-		}
-	
-		public static function add_template($name, $block){
-			self::$templates[$name] = $block;
-
-			return self::getInstance();
-		}
-	
-		public static function set_request($request){
-			self::$request = $request;
-		}
-	
-		public static function set_method($method){
-			self::$method = $method;
-		}
-	
-		public static function display_status($options=array()){
-
-			// Mark self as dead if told to die
+		/**
+		 * Outputs the status code, headers, and content
+		 *
+		 * @param array $options Output options
+		 */
+		public static function output($options=array()){
+			// Mark Frank as dead if told to die
 			if(isset($options['die']) && $options['die'] == true)
 				self::$dead = true;
 
@@ -231,32 +258,144 @@
 			if(isset($options['die']) && $options['die'] === true)
 				die();
 		}
+		
+		/**
+		 * Sets self::$run
+		 *
+		 * @param boolean $run	Value to set self::$run to
+		 */
+		public static function set_run($run){
+			self::$run = $run;
+		}
+		
+		/**
+		 * Value of self::$run
+		 *
+		 * @return boolean	Value of self::$run
+		 */
+		public static function was_run(){
+			return self::$run;
+		}
+		
+		/**
+		 * Updates Frank's status
+		 *
+		 * @param array $status	Standard Rack result-style array
+		 */
+		public static function set_status($status){
+			self::$status = $status[0];
+			self::$headers = $status[1];
+
+			if($status[2] !== false)
+				self::$body .= $status[2];
+			else
+				self::$body = '';
+		}
+		
+		/**
+		 * Gets Frank's status
+		 *
+		 * @return array Standard Rack result-style array
+		 */
+		public static function get_status(){
+			return array(self::$status, self::$headers, self::$body);
+		}
+	
+		/**
+		 * Adds a before or after filter function
+		 *
+		 * @param string   $type	 Type of filter to add (e.g. before/after)
+		 * @param function $function Function to call when filter is called
+		 */
+		public static function add_filter($type, $function){
+			array_push(self::$filters[$type], $function);
+		}
+		
+		/**
+		 * Adds a route function
+		 *
+		 * @param string   $method		Request method (get, post, etc...)
+		 * @param string   $route		Path of the function
+		 * @param function $function	Function to execute when path is requested
+		 */
+		public static function add_route($method, $route, $function){
+			self::$routes[$method][$route] = $function;
+		}
+		
+		/**
+		 * Adds an error function
+		 *
+		 * @param string   $error		Type of error to add
+		 * @param function $function	Function to execute on error
+		 */
+		public static function add_error($error, $function){
+			self::$errors[$error] = $function;
+		}
+	
+		/**
+		 * Adds a template from a function
+		 *
+		 * @param string	$name		Name of the template
+		 * @param function	$function	Function that contains the template
+		 */
+		public static function add_template($name, $function){
+			self::$templates[$name] = $function;
+		}
+	
+		/**
+		 * Sets the request url
+		 *
+		 * @param string $request	Path to set request to
+		 */
+		public static function set_request($request){
+			self::$request = $request;
+		}
+	
+		/**
+		 * Sets the request method
+		 *
+		 * @param string $method	Method to set Frank's request method to
+		 */
+		public static function set_method($method){
+			self::$method = $method;
+		}
+	
 	
 		/**
 		 * Private functions
 		 */
 
+		/**
+		 * Gets the requested path
+		 *
+		 * @return string	Path requested
+		 */
 		private static function get_request(){
-		    if(self::$request)
-				return self::$request;
-		    else
-		        return str_replace(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)), '', $_GET['q']);
+		    if(!self::$request)
+		        self::$request = str_replace(str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname(__FILE__)), '', $_GET['q']);
+
+			return self::$request;	
 		}
 
+		/**
+		 * Gets the request method
+		 *
+		 * @return string Request Method
+		 */
 		private static function get_method(){
-			if(self::$method)
-				return strtolower(self::$method);
-			else
-				return strtolower($_SERVER['REQUEST_METHOD']);
-		}
-	 
-		private static function getInstance(){
-			if (self::$instance) {
-				return self::$instance;
-			}
-			return self::$instance = new self();
+			if(!self::$method)
+				self::$method = $_SERVER['REQUEST_METHOD'];
+				
+			return strtolower(self::$method);
 		}
 	
+		/**
+		 * Finds a function to call from a request path
+		 *
+		 * @param string $method	Request method
+		 * @param string $request	Request path
+		 * @return array			Function to call and parameters to call it with
+		 */
 		private static function route($method, $request){
 		    $params = array();
 		
@@ -280,7 +419,12 @@
 			}
 		
 			if(!isset($block)){
-				header("HTTP/1.0 404 Not Found");
+				self::$status = 404;
+				
+				//We don't want to display headers for command line
+				if(!defined('STDIN'))
+					header("HTTP/1.1 404 Not Found");
+					
 				if(isset(self::$errors['404']))
 					$block = self::$errors['404'];
 				else
