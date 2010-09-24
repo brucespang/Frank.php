@@ -6,6 +6,7 @@ What Frank.php is missing:
 3. Error handling besides not_found(function(){});
 4. Environments
 5. Testing
+6. Routes with a block parameter. You'll have to use $params['captures'][0] instead.
 
 Here is Sinatra's hello world:
 require 'sinatra'
