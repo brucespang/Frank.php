@@ -6,7 +6,6 @@ What Frank.php is missing:
 3. Error handling besides not_found(function(){});
 4. Environments
 5. Testing
-6. Regex routes, or using "*" in routes. For now, just use :whatever and passing, and you should be all set.
 
 Here is Sinatra's hello world:
 require 'sinatra'

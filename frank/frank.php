@@ -1,5 +1,6 @@
 <?php
  
+	require('helpers.php');
 	require('core.php');
 	require('library.php');
 

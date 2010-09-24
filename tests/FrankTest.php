@@ -62,6 +62,20 @@
 		}
 		
 		/**
+		 * Tests if splat routes work
+		 */
+		public function testSplat(){
+			$this->assertEquals("test", $this->get_data('/splat/test', array('pass' => true)));
+		}
+
+		/**
+		 * Tests if regex routes work
+		 */
+		public function testCaptures(){
+			$this->assertEquals("test", $this->get_data('/captures/test', array('pass' => true)));
+		}
+		
+		/**
 		 * Private Functions
 		 */
 		

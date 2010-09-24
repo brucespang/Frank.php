@@ -397,28 +397,42 @@
 		 * @return array			Function to call and parameters to call it with
 		 */
 		private static function route($method, $request){
-		    $params = array();
-		
-			if(isset(self::$routes[$method][$request])){
-				$block = self::$routes[$method][$request];
-			}else{	
-				$wilds = preg_grep('#^/.*/:.*$#', array_keys(self::$routes[$method]));
+		    $params = array(
+							'splat' => array(),
+							'captures' => array()
+							);
 			
-				foreach($wilds as $wild){
-					$wild_preg = preg_replace('/:[A-Za-z0-9]+/', '(.*?)', $wild);
-					if(preg_match("#^$wild_preg\$#", $request, $matches)){
-						$block = self::$routes[$method][$wild];
-						preg_match('/:[A-Za-z0-9]+/', $wild, $wild_names);
-						foreach($wild_names as $key => $wild_name){
-							$wild_name = str_replace(':', '', $wild_name);
-							$params[$wild_name] = urldecode($matches[$key+1]);
-						}
-					}
+			if(isset(self::$routes[$method][$request])){
+				$function = self::$routes[$method][$request];
+			} elseif(($route = reverse_preg_match_array($request, array_keys(self::$routes[$method]), array('#\*(/|$)#', '/:[A-Za-z0-9]+/'))) && $route !== false){
+				$route = end($route);
+				
+				// The only different things between the request url and the
+				// route should be the regex's, so we get them.
+				$changes = url_diff($request, $route);
+
+				$function = self::$routes[$method][$route];
+
+				foreach($changes as $index => $value){
 					
+					if(preg_match('/^:/', $index)){
+						
+						//Strip leading :
+						$index = preg_replace('/^:/', '', $index);
+						
+						$params[$index] = $value;
+						
+					}elseif($index == '*'){
+						
+						$params['splat'][] = $value;
+						
+					} else {
+						$params['captures'][] = $value;
+					}
 				}
 			}
 		
-			if(!isset($block)){
+			if(!isset($function)){
 				self::$status = 404;
 				
 				//We don't want to display headers for command line
@@ -426,12 +440,12 @@
 					header("HTTP/1.1 404 Not Found");
 					
 				if(isset(self::$errors['404']))
-					$block = self::$errors['404'];
+					$function = self::$errors['404'];
 				else
-					$block = function(){ echo "We couldn't find that page."; };
+					$function = function(){ echo "We couldn't find that page."; };
 			}
 		
-			return array($block, $params);
+			return array($function, $params);
 		}
 	}
 ?>

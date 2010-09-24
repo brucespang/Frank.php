@@ -48,6 +48,14 @@
 		echo hello($params['name']);
 	});
 	
+	get("/splat/*", function($params){
+		echo $params['splat'][0];
+	});
+	
+	get("/captures/(.*?)", function($params){
+		echo $params['captures'][0];
+	});
+	
 	get("/halt", function(){
 		halt(404, 'Go away', array('Content-Type' => 'text/plain'));
 	});
