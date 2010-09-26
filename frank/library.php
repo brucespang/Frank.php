@@ -137,7 +137,16 @@
 		}
 		
  		Frank::set_status(array($status, $headers, $body));
-		Frank::output(array('die' => true));
+		Frank::output(Frank::get_status(), array('die' => true));
+	}
+
+	/**
+	 * Adds a middleware to use
+	 *
+	 * @param string or object $middleware
+	 */
+	function middleware($middleware){
+		Frank::add_middleware($middleware);
 	}
 
 ?>

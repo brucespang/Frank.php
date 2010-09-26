@@ -74,6 +74,13 @@
 		public function testCaptures(){
 			$this->assertEquals("test", $this->get_data('/captures/test', array('pass' => true)));
 		}
+
+		/**
+		 * Tests if middleware works
+		 */
+		public function testMiddleware(){
+			$this->assertEquals("Before asdf After", $this->get_data('/middleware'));
+		}
 		
 		/**
 		 * Private Functions
@@ -92,8 +99,16 @@
 			Frank::set_method($method);
 			Frank::set_run(true);
 			Frank::set_status(array(200, array(), false));
-			$status = Frank::call($options);
-			return $status[2];
+			$output = Frank::call($options);
+			
+			foreach(Frank::middleware() as $middleware){
+				if(gettype($middleware) == 'string')
+					$middleware = new $middleware;
+			
+				$output = $middleware->call($output);
+			}
+			
+			return $output[2];
 		}
 	}
 

@@ -13,7 +13,7 @@
 	});
 	
 	after(function(){
-		echo " AFTER!";
+		echo ". Good bye!";
 	});
 	 
 	get("/", function(){
@@ -62,6 +62,23 @@
 	
 	not_found(function(){
 	  echo "This file wasn't found, yo!";
+	});
+
+	class Middleware{
+		function call($output){
+			return array(200, array(), 'asdf');
+		}
+	}
+
+	class WrapMiddleware{
+		function call($output){
+			return array(200, array(), "Before $output[2] After");
+		}
+	}
+
+	get("/middleware", function(){
+		middleware('Middleware');
+		middleware('WrapMiddleware');
 	});
 	
 ?>
