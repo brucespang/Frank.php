@@ -10,6 +10,9 @@
 	configure(function(){
 		$test = 'test';
 		set(array('views' => dirname(__FILE__) . '/templates'));
+		set(array('extension' => function(){
+				return '.'.end(explode('.', __FILE__));
+			}));
 	});
 	
 	after(function(){
@@ -17,7 +20,8 @@
 	});
 	 
 	get("/", function(){
-		echo "Welcome to Frank.php";
+		echo "Welcome to Frank";
+		echo settings::get('extension');
 	});
 	
 	get("/template", function(){

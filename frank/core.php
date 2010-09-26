@@ -93,13 +93,6 @@
 		 * @var array
 		 */
 		private static $middleware = array();
-
-		/**
-		 * Template directory location
-		 *
-		 * @var string
-		 */
-		public static $view_path = '';
 	
 		/**
 		 * Public functions
@@ -162,6 +155,8 @@
 		public static function render_template($name, $options){
 			$locals = $options['locals'] ? $options['locals'] : array();
 			
+			$view_path = settings::get('views');
+			
 			if(isset(self::$templates[$name])){
 		
 				$template = self::$templates[$name];
@@ -171,14 +166,14 @@
 					self::$body .= ob_get_contents();
 				ob_end_clean();
 
-			}elseif(file_exists(self::$view_path.'/'.$name.'.html')){
+			}elseif(file_exists($view_path.'/'.$name)){
 		
 				$template = function($path, $locals){
 					require($path);
 				};
 				
 				ob_start();
-					$template(self::$view_path.'/'.$name.'.html', $locals);
+					$template($view_path.'/'.$name, $locals);
 					self::$body .= ob_get_contents();
 				ob_end_clean();
 			}

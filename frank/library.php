@@ -55,8 +55,8 @@
 	 * @param array $options 	Options for Frank
 	 */
 	function set($options){
-		if(isset($options['views']))
-			Frank::$view_path = $options['views'];
+		foreach($options as $option => $value)
+			settings::set($option, $value);
 	}
 
 	/**

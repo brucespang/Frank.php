@@ -2,6 +2,7 @@
  
 	require('helpers.php');
 	require('core.php');
+	require('settings.php');
 	require('library.php');
 
 	/**
