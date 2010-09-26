@@ -55,10 +55,28 @@
 	 * @param array $options 	Options for Frank
 	 */
 	function set($options){
-		if(isset($options['views']))
-			Frank::$view_path = $options['views'];
+		foreach($options as $option => $value)
+			settings::set($option, $value);
 	}
-
+	
+	/**
+	 * Sets a setting to true
+	 *
+	 * @param string $setting	Name of setting
+	 */
+	function enable($setting){
+		settings::set($setting, true);
+	}
+	
+	/**
+	 * Sets a setting to false
+	 *
+	 * @param string $setting	Name of setting
+	 */
+	function disable($setting){
+		settings::set($setting, false);
+	}
+	
 	/**
 	 * API for adding a template function
 	 *
@@ -137,7 +155,16 @@
 		}
 		
  		Frank::set_status(array($status, $headers, $body));
-		Frank::output(array('die' => true));
+		Frank::output(Frank::get_status(), array('die' => true));
+	}
+
+	/**
+	 * Adds a middleware to use
+	 *
+	 * @param string or object $middleware
+	 */
+	function middleware($middleware){
+		Frank::add_middleware($middleware);
 	}
 
 ?>

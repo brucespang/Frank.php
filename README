@@ -2,11 +2,10 @@ Frank.php is a clone of Sinatra.rb. It's much like Sinatra, with a few things mi
 
 What Frank.php is missing:
 1. Spiffy template languages like haml and sass.
-2. Middleware.
-3. Error handling besides not_found(function(){});
-4. Environments
-5. Testing
-6. Routes with a block parameter. You'll have to use $params['captures'][0] instead.
+2. Error handling besides not_found(function(){});
+3. Environments
+4. Testing
+5. Routes with a block parameter. You'll have to use $params['captures'][0] instead.
 
 Here is Sinatra's hello world:
 require 'sinatra'

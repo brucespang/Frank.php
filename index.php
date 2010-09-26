@@ -10,14 +10,18 @@
 	configure(function(){
 		$test = 'test';
 		set(array('views' => dirname(__FILE__) . '/templates'));
+		set(array('extension' => function(){
+				return '.'.end(explode('.', __FILE__));
+			}));
 	});
 	
 	after(function(){
-		echo " AFTER!";
+		echo ". Good bye!";
 	});
 	 
 	get("/", function(){
-		echo "Welcome to Frank.php";
+		echo "Welcome to Frank";
+		echo settings::get('extension');
 	});
 	
 	get("/template", function(){
@@ -62,6 +66,23 @@
 	
 	not_found(function(){
 	  echo "This file wasn't found, yo!";
+	});
+
+	class Middleware{
+		function call($output){
+			return array(200, array(), 'asdf');
+		}
+	}
+
+	class WrapMiddleware{
+		function call($output){
+			return array(200, array(), "Before $output[2] After");
+		}
+	}
+
+	get("/middleware", function(){
+		middleware('Middleware');
+		middleware('WrapMiddleware');
 	});
 	
 ?>

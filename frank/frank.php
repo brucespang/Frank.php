@@ -2,6 +2,7 @@
  
 	require('helpers.php');
 	require('core.php');
+	require('settings.php');
 	require('library.php');
 
 	/**
@@ -9,8 +10,15 @@
 	 */
 	function run(){
 		if(Frank::was_run() !== true){
-			Frank::call();
-			Frank::output();
+			$output = Frank::call();
+			foreach(Frank::middleware() as $middleware){
+				if(gettype($middleware) == 'string')
+					$middleware = new $middleware;
+			
+				$output = $middleware->call($output);
+			}
+			
+			Frank::output($output);
 		}
 	}
 

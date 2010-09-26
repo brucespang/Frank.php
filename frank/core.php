@@ -74,7 +74,7 @@
 		);
 	
 		/**
-		 * List of errors and their corresponding functions
+		 * Array of errors and their corresponding functions
 		 *
 		 * @var array
 		 */
@@ -88,11 +88,11 @@
 		private static $templates = array();
 
 		/**
-		 * Template directory location
+		 * Array of middleware classes
 		 *
-		 * @var string
+		 * @var array
 		 */
-		public static $view_path = '';
+		private static $middleware = array();
 	
 		/**
 		 * Public functions
@@ -155,6 +155,8 @@
 		public static function render_template($name, $options){
 			$locals = $options['locals'] ? $options['locals'] : array();
 			
+			$view_path = settings::get('views');
+			
 			if(isset(self::$templates[$name])){
 		
 				$template = self::$templates[$name];
@@ -164,14 +166,14 @@
 					self::$body .= ob_get_contents();
 				ob_end_clean();
 
-			}elseif(file_exists(self::$view_path.'/'.$name.'.html')){
+			}elseif(file_exists($view_path.'/'.$name)){
 		
 				$template = function($path, $locals){
 					require($path);
 				};
 				
 				ob_start();
-					$template(self::$view_path.'/'.$name.'.html', $locals);
+					$template($view_path.'/'.$name, $locals);
 					self::$body .= ob_get_contents();
 				ob_end_clean();
 			}
@@ -182,7 +184,7 @@
 		 *
 		 * @param array $options Output options
 		 */
-		public static function output($options=array()){
+		public static function output($output, $options=array()){
 			// Mark Frank as dead if told to die
 			if(isset($options['die']) && $options['die'] == true)
 				self::$dead = true;
@@ -242,15 +244,15 @@
 			                );
 		
 			
-			if(isset($status_codes[self::$status])){
-				$status_message = $status_codes[self::$status];
-				header('HTTP/1.1 '.self::$status." $status_message");
+			if(isset($status_codes[$output[0]])){
+				$status_message = $status_codes[$output[0]];
+				header('HTTP/1.1 '.$output[0]." $status_message");
 			}
 
-			foreach(self::$headers as $type => $header)
-				header("$type: $header", self::$status);
+			foreach($output[1] as $type => $header)
+				header("$type: $header", $output[0]);
 
-			echo(self::$body);
+			echo($output[2]);
 			
 			// Clean up status in case this is run again. (Probably shouldn't happen, but who knows?)
 			self::set_status(array(200, array(), ''));
@@ -360,6 +362,23 @@
 			self::$method = $method;
 		}
 	
+		/**
+		 * Adds a piece of middleware
+		 *
+		 * @param object or string $middleware 	Object for middleware, or name of middleware class
+		 */
+		public static function add_middleware($middleware){
+			self::$middleware[] = $middleware;
+		}
+		
+		/**
+		 * Gets an array of middleware to use
+		 *
+		 * @return array	List of middleware
+		 */
+		public static function middleware(){
+			return self::$middleware;
+		}
 	
 		/**
 		 * Private functions
