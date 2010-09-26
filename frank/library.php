@@ -58,7 +58,25 @@
 		foreach($options as $option => $value)
 			settings::set($option, $value);
 	}
-
+	
+	/**
+	 * Sets a setting to true
+	 *
+	 * @param string $setting	Name of setting
+	 */
+	function enable($setting){
+		settings::set($setting, true);
+	}
+	
+	/**
+	 * Sets a setting to false
+	 *
+	 * @param string $setting	Name of setting
+	 */
+	function disable($setting){
+		settings::set($setting, false);
+	}
+	
 	/**
 	 * API for adding a template function
 	 *
