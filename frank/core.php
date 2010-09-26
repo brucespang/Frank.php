@@ -160,17 +160,15 @@
 			if(isset(self::$templates[$name])){
 		
 				$template = self::$templates[$name];
-
+		
 				ob_start();
 					call_user_func($template, $locals);
 					self::$body .= ob_get_contents();
 				ob_end_clean();
-
+		
 			}elseif(file_exists($view_path.'/'.$name)){
 		
-				$template = function($path, $locals){
-					require($path);
-				};
+				$template = create_function('$path, $locals', 'require($path);');
 				
 				ob_start();
 					$template($view_path.'/'.$name, $locals);
@@ -461,7 +459,7 @@
 				if(isset(self::$errors['404']))
 					$function = self::$errors['404'];
 				else
-					$function = function(){ echo "We couldn't find that page."; };
+					$function = create_function('', 'echo "We couldn\'t find that page.";');
 			}
 		
 			return array($function, $params);
