@@ -153,7 +153,7 @@
 		 * @param array  $options	Options to control template rendering
 		 */
 		public static function render_template($name, $options){
-			$locals = $options['locals'] ? $options['locals'] : array();
+			$locals = isset($options['locals']) ? $options['locals'] : array();
 			
 			$view_path = settings::get('views');
 			
