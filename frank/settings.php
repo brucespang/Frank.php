@@ -26,6 +26,9 @@
 		 * @return string 				Value of the setting
 		 */
 		function get($setting_name){
+			if(!isset(self::$settings[$setting_name]))
+				return false;
+				
 			if(gettype(self::$settings[$setting_name]) == 'object')
 				$value = call_user_func(self::$settings[$setting_name]);
 			else

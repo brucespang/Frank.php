@@ -163,7 +163,7 @@
 		
 				ob_start();
 					call_user_func($template, $locals);
-					self::$body .= ob_get_contents();
+					$result = ob_get_contents();
 				ob_end_clean();
 		
 			}elseif(file_exists($view_path.'/'.$name)){
@@ -172,9 +172,26 @@
 				
 				ob_start();
 					$template($view_path.'/'.$name, $locals);
-					self::$body .= ob_get_contents();
+					$result = ob_get_contents();
 				ob_end_clean();
 			}
+			
+			if(isset($options['layout']) || settings::get('layout') !== false){
+				$layout = create_function('$path,$yield', 'require($path);');
+				
+				if(isset($options['layout']))
+					$file = $view_path.'/'.$options['layout'];
+				else
+					$file = $view_path.'/'.settings::get('layout');
+
+				ob_start();
+					$layout($file, $result);
+					$result = ob_get_contents();
+				ob_end_clean();
+			}
+			
+			self::$body .= $result;
+			
 		}
 		
 		/**
